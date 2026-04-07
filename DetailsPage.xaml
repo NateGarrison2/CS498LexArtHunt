@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LexArtHunt.DetailsPage"
+             Title="Artwork Details">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+            <Image x:Name="ArtImage" HeightRequest="250" Aspect="AspectFill" />
+
+            <Label x:Name="TitleLabel" FontSize="24" FontAttributes="Bold" />
+            <Label x:Name="ArtistLabel" FontSize="18" TextColor="Gray" />
+            <Label x:Name="DescriptionLabel" FontSize="16" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
