@@ -8,44 +8,63 @@ public partial class MainPage : ContentPage
     public MainPage()
     {
         InitializeComponent();
-        LoadPins();
+
+        // Use OnAppearing so the map is ready before we add pins
     }
 
-    private void LoadPins()
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        await LoadPinsFromDatabase();
+    }
+
+    private async Task LoadPinsFromDatabase()
     {
         using var db = new AppDbContext();
-        var artworks = db.Items.ToList();
+        var artItems = db.Items.ToList();
 
-        // Center map on Lexington initially
-        ArtMap.MoveToRegion(MapSpan.FromCenterAndRadius(new Location(38.0406, -84.5037), Distance.FromMiles(3)));
-
-        foreach (var art in artworks)
+        foreach (var item in artItems)
         {
-            // VERY BASIC PARSING: Assumes 'Location' string looks like "38.0406, -84.5037"
-            // You may need to tweak this depending on exactly how Nate formatted the CSV!
-            if (!string.IsNullOrEmpty(art.Location) && art.Location.Contains(","))
+            try
             {
-                var coords = art.Location.Split(',');
-                if (double.TryParse(coords[0], out double lat) && double.TryParse(coords[1], out double lon))
+                // 1. Geocode the address to get Coordinates
+                // We add ", Lexington, KY" to ensure accuracy
+                string fullAddress = $"{item.Address}, Lexington, KY";
+                var locations = await Geocoding.Default.GetLocationsAsync(fullAddress);
+                var location = locations?.FirstOrDefault();
+
+                if (location != null)
                 {
+                    // 2. Create the Pin
                     var pin = new Pin
                     {
-                        Label = art.Title,
-                        Address = art.Artist,
+                        Label = item.Title,
+                        Address = item.Artist, // Shows artist name under title
                         Type = PinType.Place,
-                        Location = new Location(lat, lon)
+                        Location = new Location(location.Latitude, location.Longitude)
                     };
 
-                    // Wire up the click event for the Details view
-                    pin.MarkerClicked += async (s, args) =>
+                    // 3. Handle the click (Lauren/Alex's Details Story)
+                    pin.MarkerClicked += async (s, e) =>
                     {
-                        args.HideInfoWindow = true; // Stop default popups
-                        await Navigation.PushAsync(new DetailsPage(art));
+                        // For the prototype, we'll just show a popup
+                        // In the final app, this would navigate to DetailsPage
+                        await DisplayAlert(item.Title,
+                            $"Artist: {item.Artist}\n\n{item.Description}", "Close");
                     };
 
                     ArtMap.Pins.Add(pin);
                 }
             }
+            catch (Exception ex)
+            {
+                // If geocoding fails for one pin, we just skip it and move to the next
+                System.Diagnostics.Debug.WriteLine($"Geocoding failed for {item.Title}: {ex.Message}");
+            }
         }
+
+        // Center the map on downtown Lexington
+        var lexington = new Location(38.0464, -84.4970);
+        ArtMap.MoveToRegion(MapSpan.FromCenterAndRadius(lexington, Distance.FromMiles(1.5)));
     }
 }

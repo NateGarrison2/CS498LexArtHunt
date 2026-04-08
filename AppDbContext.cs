@@ -16,9 +16,16 @@ public class MyItem
 {
     [Key]
     public int OBJECTID { get; set; }
+    public string District { get; set; }
     public string Title { get; set; }
-    public string Artist { get; set; }
     public string Description { get; set; }
-    public string Location { get; set; } // Assuming this holds coordinates like "38.04, -84.50"
+    public string Artist { get; set; }
+    public string Category { get; set; }
+    public string YearCreated { get; set; }
+    public string Address { get; set; }
+    public string Location { get; set; } // This is the descriptive location
+    public string OwnedBy { get; set; }
+    public string GlobalID { get; set; }
+    public string Viewable { get; set; }
     public string ImagePath { get; set; }
 }
