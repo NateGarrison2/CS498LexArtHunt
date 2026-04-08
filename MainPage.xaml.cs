@@ -47,10 +47,8 @@ public partial class MainPage : ContentPage
                     // 3. Handle the click (Lauren/Alex's Details Story)
                     pin.MarkerClicked += async (s, e) =>
                     {
-                        // For the prototype, we'll just show a popup
-                        // In the final app, this would navigate to DetailsPage
-                        await DisplayAlert(item.Title,
-                            $"Artist: {item.Artist}\n\n{item.Description}", "Close");
+                        // Navigate to the DetailsPage and pass the 'item' from the database
+                        await Navigation.PushAsync(new DetailsPage(item));
                     };
 
                     ArtMap.Pins.Add(pin);
