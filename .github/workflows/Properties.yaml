@@ -9,8 +9,8 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-      - name: Install MAUI Workload
-        run: dotnet workload install maui --ignore-failed-sources
+      - name: Install MAUI Android Workload
+        run: dotnet workload install maui-android --ignore-failed-sources
       - name: Restore
         run: dotnet restore
       - name: Build
