@@ -39,4 +39,4 @@ jobs:
         env:
           GOOGLEAPIKEY: ${{ secrets.GOOGLEAPIKEY }}
       - name: Build
-        run: dotnet publish -f:${{ matrix.target }} -c:Release /p:GOOGLEAPIKEY=${{ secrets.GOOGLEAPIKEY }}
+        run: dotnet publish -f:${{ matrix.target }} -c:Release /p:google_maps_api_key=${{ secrets.GOOGLEAPIKEY }}
