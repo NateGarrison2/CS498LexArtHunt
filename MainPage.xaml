@@ -1,12 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:maps="clr-namespace:Microsoft.Maui.Controls.Maps;assembly=Microsoft.Maui.Controls.Maps"
+             xmlns:mapsui="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
              x:Class="LexArtHunt.MainPage"
              Title="Lexington Art Hunt">
 
     <Grid>
-        <maps:Map x:Name="ArtMap" IsShowingUser="True" />
+        <mapsui:MapView x:Name="ArtMap" 
+                    HorizontalOptions="Fill" 
+                    VerticalOptions="Fill" />
     </Grid>
 
 </ContentPage>

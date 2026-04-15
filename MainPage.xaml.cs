@@ -1,81 +1,99 @@
-﻿using Microsoft.Maui.Controls.Maps;
-using Microsoft.Maui.Maps;
+﻿using LexArtHunt;
+using Mapsui.UI.Maui;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Controls;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace LexArtHunt;
 
 public partial class MainPage : ContentPage
 {
+    private bool _isMapLoaded = false;
+
     public MainPage()
     {
         InitializeComponent();
-
-        // Use OnAppearing so the map is ready before we add pins
+        this.BackgroundColor = Colors.Transparent;
     }
 
     protected override async void OnAppearing()
     {
         base.OnAppearing();
 
-        // Request permission from the user
-        PermissionStatus status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
-
-        if (status == PermissionStatus.Granted)
+        // Only load the map once to prevent memory leaks if you navigate back and forth
+        if (!_isMapLoaded)
         {
-            ArtMap.IsShowingUser = true; // Turn on the blue dot
-            await LoadPinsFromDatabase();
-        }
-        else
-        {
-            await DisplayAlertAsync("Permission Denied", "Can't show your location without GPS perms!", "OK");
-            await LoadPinsFromDatabase(); // Still load art even if GPS fails
+            await SetupMapAndPermissionsAsync();
+            _isMapLoaded = true;
         }
     }
 
-    private async Task LoadPinsFromDatabase()
+    private async Task SetupMapAndPermissionsAsync()
+    {
+        // 1. Initialize the free OpenStreetMap layer
+        ArtMap.Map?.Layers.Add(Mapsui.Tiling.OpenStreetMap.CreateTileLayer());
+
+        // 2. Request GPS Permissions (Crucial for 2026 Mobile Standards)
+        var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
+        if (status != PermissionStatus.Granted)
+        {
+            status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+        }
+
+        if (status == PermissionStatus.Granted)
+        {
+            ArtMap.MyLocationEnabled = true; // Turn on the Blue Dot
+        }
+
+        // 3. Load the data
+        await LoadPinsFromDatabaseAsync();
+    }
+
+    private async Task LoadPinsFromDatabaseAsync()
     {
         using var db = new AppDbContext();
-        var artItems = db.Items.ToList();
+
+        // The .Value and ! ensure we satisfy the .NET 10 Nullable checks
+        var artItems = db.Items
+                         .Where(i => i.Latitude != null && i.Longitude != null)
+                         .ToList();
 
         foreach (var item in artItems)
         {
-            try
+            var pin = new Pin(ArtMap)
             {
-                // 1. Geocode the address to get Coordinates
-                // We add ", Lexington, KY" to ensure accuracy
-                string fullAddress = $"{item.Address}, Lexington, KY";
-                var locations = await Geocoding.Default.GetLocationsAsync(fullAddress);
-                var location = locations?.FirstOrDefault();
+                Position = new Position(item.Latitude!.Value, item.Longitude!.Value),
+                Label = item.Title,
+                Address = item.Artist,
+                Type = PinType.Pin,
+                Tag = item
+            };
 
-                if (location != null)
-                {
-                    // 2. Create the Pin
-                    var pin = new Pin
-                    {
-                        Label = item.Title,
-                        Address = item.Artist, // Shows artist name under title
-                        Type = PinType.Place,
-                        Location = new Location(location.Latitude, location.Longitude)
-                    };
-
-                    // 3. Handle the click 
-                    pin.MarkerClicked += async (s, e) =>
-                    {
-                        // Navigate to the DetailsPage and pass the 'item' from the database
-                        await Navigation.PushAsync(new DetailsPage(item));
-                    };
-
-                    ArtMap.Pins.Add(pin);
-                }
-            }
-            catch (Exception ex)
-            {
-                // If geocoding fails for one pin, we just skip it and move to the next
-                System.Diagnostics.Debug.WriteLine($"Geocoding failed for {item.Title}: {ex.Message}");
-            }
+            ArtMap.Pins.Add(pin);
+            System.Diagnostics.Debug.WriteLine($"PIN ADDED: {item.Title} at {item.Latitude}, {item.Longitude}");
         }
 
-        // Center the map on downtown Lexington
-        var lexington = new Location(38.0464, -84.4970);
-        ArtMap.MoveToRegion(MapSpan.FromCenterAndRadius(lexington, Distance.FromMiles(1.5)));
+        // NEW .NET 10 COMPLIANT INTERACTION:
+        // We listen for a tap on the MapView, then ask it which pin was touched.
+        ArtMap.PinClicked += (s, e) =>
+        {
+            if (e.Pin != null)
+            {
+                e.Handled = true; // Stop the map from moving
+                var selectedItem = (MyItem)e.Pin.Tag;
+
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    await Navigation.PushAsync(new DetailsPage(selectedItem));
+                });
+            }
+        };
+
+        // Center on Lex
+        var lexington = new Position(38.0464, -84.4970);
+        ArtMap.Map?.Navigator.CenterOnAndZoomTo(lexington.ToMapsui(), 2);
+
+        ArtMap.Refresh();
     }
 }
