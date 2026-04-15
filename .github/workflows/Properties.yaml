@@ -1,2 +1,15 @@
 name: Build
-run: dotnet publish -f:net10.0-android -c:Release /p:GOOGLEAPIKEY=${{ secrets.GOOGLEAPIKEY }}
+on: pull_request
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x.x'
+      - name: Install MAUI workload
+        run: dotnet workload install maui
+      - name: Build
+        run: dotnet publish -f:net10.x.x-android -c:Release /p:GOOGLEAPIKEY=${{ secrets.GOOGLEAPIKEY }}
