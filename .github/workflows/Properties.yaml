@@ -28,6 +28,11 @@ jobs:
             dotnet workload install maui-ios maui-android --source https://api.nuget.org/v3/index.json
           fi
         shell: bash
+      
+        env:
+          GOOGLEAPIKEY: ${{ secrets.GOOGLEAPIKEY }}
+      - name: Build
+        run: dotnet publish -f:${{ matrix.target }} -c:Release /p:GOOGLEAPIKEY=${{ secrets.GOOGLEAPIKEY }}
       - name: Check Google API Key
         if: matrix.os == 'ubuntu-latest'
         run: |
@@ -36,7 +41,3 @@ jobs:
           else
             echo "Key IS set (length: ${#GOOGLEAPIKEY})"
           fi
-        env:
-          GOOGLEAPIKEY: ${{ secrets.GOOGLEAPIKEY }}
-      - name: Build
-        run: dotnet publish -f:${{ matrix.target }} -c:Release /p:GOOGLEAPIKEY=${{ secrets.GOOGLEAPIKEY }}
