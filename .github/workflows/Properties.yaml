@@ -25,7 +25,7 @@ jobs:
           elif [ "${{ matrix.os }}" = "windows-latest" ]; then
             dotnet workload install maui-windows --source https://api.nuget.org/v3/index.json
           elif [ "${{ matrix.os }}" = "macos-latest" ]; then
-            dotnet workload install maui-ios --source https://api.nuget.org/v3/index.json
+            dotnet workload install maui-ios maui-android --source https://api.nuget.org/v3/index.json
           fi
         shell: bash
       - name: Check Google API Key
@@ -39,4 +39,4 @@ jobs:
         env:
           GOOGLEAPIKEY: ${{ secrets.GOOGLEAPIKEY }}
       - name: Build
-        run: dotnet publish -f:${{ matrix.target }} -c:Release /p:google_maps_api_key=${{ secrets.GOOGLEAPIKEY }}
+        run: dotnet publish -f:${{ matrix.target }} -c:Release /p:GOOGLEAPIKEY=${{ secrets.GOOGLEAPIKEY }}
