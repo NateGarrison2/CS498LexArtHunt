@@ -32,7 +32,7 @@ jobs:
         env:
           GOOGLEAPIKEY: ${{ secrets.GOOGLEAPIKEY }}
       - name: Build
-        run: dotnet publish -f:${{ matrix.target }} -c:Release /p:GOOGLEAPIKEY=${{ secrets.GOOGLEAPIKEY }}
+        run: dotnet publish -f:${{ matrix.target }} -c:Release /p:GOOGLEAPIKEY=${{ secrets.GOOGLEAPIKEY }} --no-dependencies
       - name: Check Google API Key
         if: matrix.os == 'ubuntu-latest'
         run: |
