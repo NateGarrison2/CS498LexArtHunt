@@ -4,12 +4,12 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
       - name: Install MAUI Workloads
-        run: dotnet workload install android maui --ignore-failed-sources
+        run: dotnet workload restore
       - name: Build
-        run: dotnet publish -f:net10.0-android -c:Release /p:google_maps_api_key=${{ secrets.GOOGLEAPIKEY }}   
+        run: dotnet publish -f:net10.0-android -c:Release /p:google_maps_api_key=${{ secrets.GOOGLEAPIKEY }}
