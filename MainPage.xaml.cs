@@ -15,7 +15,20 @@ public partial class MainPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await LoadPinsFromDatabase();
+
+        // Request permission from the user
+        PermissionStatus status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+
+        if (status == PermissionStatus.Granted)
+        {
+            ArtMap.IsShowingUser = true; // Turn on the blue dot
+            await LoadPinsFromDatabase();
+        }
+        else
+        {
+            await DisplayAlertAsync("Permission Denied", "Can't show your location without GPS perms!", "OK");
+            await LoadPinsFromDatabase(); // Still load art even if GPS fails
+        }
     }
 
     private async Task LoadPinsFromDatabase()
@@ -44,7 +57,7 @@ public partial class MainPage : ContentPage
                         Location = new Location(location.Latitude, location.Longitude)
                     };
 
-                    // 3. Handle the click (Lauren/Alex's Details Story)
+                    // 3. Handle the click 
                     pin.MarkerClicked += async (s, e) =>
                     {
                         // Navigate to the DetailsPage and pass the 'item' from the database
