@@ -34,6 +34,14 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
+            <!-- Delete Collection Button -->
+            <Button x:Name="DeleteCollectionButton"
+                Text="Delete Entire Collection"
+                Clicked="OnDeleteCollectionClicked"
+                Margin="0,16,0,0">
+
+            </Button>
+
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
