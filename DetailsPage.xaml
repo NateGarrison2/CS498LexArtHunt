@@ -30,6 +30,14 @@
             <Label x:Name="DescriptionLabel" 
                    FontSize="16" 
                    LineBreakMode="WordWrap" />
+            
+            <!-- Collection Button -->
+            <Button x:Name="CollectButton"
+                    Text="Add to Collection"
+                    Clicked="OnCollectClicked"
+                    Margin="0,16,0,0">
+                
+            </Button>
 
         </VerticalStackLayout>
     </ScrollView>

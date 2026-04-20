@@ -4,6 +4,13 @@
              xmlns:mapsui="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
              x:Class="LexArtHunt.MainPage"
              Title="Lexington Art Hunt">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Collection"
+                     Order="Primary"
+                     Clicked="OnViewCollectionClicked">
+            
+        </ToolbarItem>
+    </ContentPage.ToolbarItems>
 
     <Grid>
         <mapsui:MapView x:Name="ArtMap" 

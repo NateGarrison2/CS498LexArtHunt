@@ -52,12 +52,16 @@ public partial class MainPage : ContentPage
 
     private async Task LoadPinsFromDatabaseAsync()
     {
-        using var db = new AppDbContext();
+        List<MyItem> artItems;
 
         // The .Value and ! ensure we satisfy the .NET 10 Nullable checks
-        var artItems = db.Items
-                         .Where(i => i.Latitude != null && i.Longitude != null)
-                         .ToList();
+        using (var db = new AppDbContext())
+        {
+            artItems = db.Items
+                      .Where(i => i.Latitude != null && i.Longitude != null)
+                      .ToList();
+        }
+            
 
         foreach (var item in artItems)
         {
@@ -95,5 +99,10 @@ public partial class MainPage : ContentPage
         ArtMap.Map?.Navigator.CenterOnAndZoomTo(lexington.ToMapsui(), 2);
 
         ArtMap.Refresh();
+    }
+
+    private async void OnViewCollectionClicked(object sender, EventArgs e)
+    {
+        await Navigation.PushAsync(new CollectionPage());
     }
 }

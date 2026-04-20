@@ -9,6 +9,7 @@ public partial class App : Application
 
     protected override Window CreateWindow(IActivationState? activationState)
     {
+        
         // 1. Create your starting page (MainPage)
         var mainPage = new MainPage();
 
@@ -17,5 +18,7 @@ public partial class App : Application
 
         // 3. Return a new Window with your nav stack as the root
         return new Window(navPage);
+        
+        
     }
 }

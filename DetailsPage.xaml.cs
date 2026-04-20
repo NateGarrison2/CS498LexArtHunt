@@ -6,8 +6,10 @@ namespace LexArtHunt;
 
 public partial class DetailsPage : ContentPage
 {
+    private readonly MyItem _item;
     public DetailsPage(MyItem item)
     {
+        _item = item;
         InitializeComponent();
 
         // Bind the text data
@@ -24,6 +26,28 @@ public partial class DetailsPage : ContentPage
             ArtImage.Source = ImageSource.FromFile(resourceId);
 
             System.Diagnostics.Debug.WriteLine($"DetailsPage loading image resource: {resourceId}");
+        }
+
+        UpdateCollectButton();
+    }
+
+    private void UpdateCollectButton()
+    {
+        using var userDb = new UserDbContext();
+        bool alreadyCollected = userDb.CollectedItems.Any(c => c.ArtItemObjectId == _item.OBJECTID);
+        CollectButton.Text = alreadyCollected ? "Collected" : "Add to Collection";
+        CollectButton.IsEnabled = !alreadyCollected;
+    }
+
+    private async void OnCollectClicked(object sender, EventArgs e)
+    {
+        using var userDb = new UserDbContext();
+        if (!userDb.CollectedItems.Any(c => c.ArtItemObjectId == _item.OBJECTID))
+        {
+            userDb.CollectedItems.Add(new CollectedItem { ArtItemObjectId = _item.OBJECTID });
+            await userDb.SaveChangesAsync();
+            UpdateCollectButton();
+            await DisplayAlertAsync("Collected!", $"{_item.Title} has been added to your collection.", "OK");
         }
     }
 }

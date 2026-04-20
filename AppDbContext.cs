@@ -13,8 +13,9 @@ public class AppDbContext : DbContext
 
         // FORCE REFRESH: This ensures your local cache always matches your new geocoded DB
         // You can remove this line AFTER the demo if you want to save user-generated data
-        if (File.Exists(dbPath)) { File.Delete(dbPath); }
 
+        /* 
+        if (File.Exists(dbPath)) { File.Delete(dbPath); }
         if (!File.Exists(dbPath))
         {
             // Open the fresh geocoded DB from your project assets
@@ -23,6 +24,7 @@ public class AppDbContext : DbContext
             stream.CopyTo(memoryStream);
             File.WriteAllBytes(dbPath, memoryStream.ToArray());
         }
+        */
 
         optionsBuilder.UseSqlite($"Data Source={dbPath}");
     }
