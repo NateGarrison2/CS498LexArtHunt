@@ -6,9 +6,9 @@ namespace LexArtHunt
 {
     public class CollectedArtViewModel
     {
-        public MyItem ArtItem { get; set; }
-        public CollectedItem CollectedItem { get; set; }
-        public string CollectedAtFormated => $"Collected on: {CollectedItem.CollectedAt.ToLocalTime():MMMM dd, yyyy}";
+        public MyItem? ArtItem { get; set; }
+        public CollectedItem? CollectedItem { get; set; }
+        public string CollectedAtFormated => $"Collected on: {CollectedItem?.CollectedAt.ToLocalTime():MMMM dd, yyyy}";
     }
     public partial class CollectionPage : ContentPage
     {
@@ -53,7 +53,10 @@ namespace LexArtHunt
             {
                 // Clear selection so the item can be tapped again on return
                 CollectionView.SelectedItem = null;
-                await Navigation.PushAsync(new DetailsPage(vm.ArtItem));
+                if (vm.ArtItem != null)
+                {
+                    await Navigation.PushAsync(new DetailsPage(vm.ArtItem));
+                }
             }
         }
 

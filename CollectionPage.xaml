@@ -23,10 +23,10 @@
                                FontAttributes="Bold" />
                                     <Label Text="{Binding ArtItem.Artist}" 
                                FontSize="14" 
-                               TextColor="Gray" />
+                               TextColor="Black" />
                                     <Label Text="{Binding CollectedAtFormated}" 
                                FontSize="12" 
-                               TextColor="Gray" />
+                               TextColor="Black" />
                                 </VerticalStackLayout>
                             </Border>
                         </Grid>
