@@ -1,31 +1,24 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Storage;
-
-namespace LexArtHunt;
+﻿namespace LexArtHunt;
 
 public partial class App : Application
 {
     public App()
     {
         InitializeComponent();
-
-        // Ensure DB is copied before the app loads the first page
-        Task.Run(async () => await CopyDatabaseIfNeeded()).Wait();
-
-        MainPage = new NavigationPage(new MainPage());
     }
 
-    private async Task CopyDatabaseIfNeeded()
+    protected override Window CreateWindow(IActivationState? activationState)
     {
-        string dbPath = Path.Combine(FileSystem.AppDataDirectory, "appdata.db");
+        
+        // 1. Create your starting page (MainPage)
+        var mainPage = new MainPage();
 
-        if (!File.Exists(dbPath))
-        {
-            using Stream fileStream = await FileSystem.Current.OpenAppPackageFileAsync("appdata.db");
-            using FileStream outputStream = File.OpenWrite(dbPath);
-            await fileStream.CopyToAsync(outputStream);
-        }
+        // 2. Wrap it in a NavigationPage so you can use 'Navigation.PushAsync'
+        var navPage = new NavigationPage(mainPage);
+
+        // 3. Return a new Window with your nav stack as the root
+        return new Window(navPage);
+        
+        
     }
 }
